@@ -1,0 +1,34 @@
+Setup Instructions
+
+    Install Dependencies:
+    bash
+
+pip install flask flask-wtf bcrypt pyotp pyjwt python-Levenshtein
+File Structure:
+
+    Place app.py in the root directory.
+    Create a templates folder and place the HTML files (index.html, login.html, register.html, mapper.html) inside.
+
+Run the Application:
+bash
+
+    python app.py
+    Access the Application:
+        Open http://localhost:5000 in a browser.
+        Register with a username and password, save the TOTP secret, and set up 2FA with an authenticator app (e.g., Google Authenticator).
+        Log in to access the mapper.
+
+Usage
+
+    Input Terms: Enter ocean-related terms (e.g., "temperature", "salinity") in the text area, one per line.
+    Select Standard: Choose "SeaDataNet" or "CF" as the target standard.
+    Map Terms: Submit to see mapped terms, descriptions, URIs, and similarity scores.
+    Export: View results in JSON-LD format or download all user mappings via the export link.
+
+Notes
+
+    The vocabulary database is seeded with a small set of terms for demonstration. In a production environment, integrate with NVS SPARQL endpoints or load larger vocabularies.
+    The Levenshtein-based matching is basic; enhance with semantic similarity (e.g., BERT) for better accuracy.
+    JSON-LD ensures interoperability with platforms like OBIS or EMODnet.
+    The tool stores mappings for reuse and supports export for sharing.
+    For production, update secret keys, use a robust database (e.g., PostgreSQL), and deploy on a cloud platform
