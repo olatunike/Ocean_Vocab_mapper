@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Vocabulary Mapper</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-4">Ocean Vocabulary Mapper</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-4">
+                <label for="input_terms" class="block text-sm font-medium text-gray-700">Input Terms (one per line)</label>
+                {{ form.input_terms(class="mt-1 block w-full border-gray-300 rounded-md shadow-sm", rows=5) }}
+            </div>
+            <div class="mb-4">
+                <label for="standard" class="block text-sm font-medium text-gray-700">Target Standard</label>
+                {{ form.standard(class="mt-1 block w-full border-gray-300 rounded-md shadow-sm") }}
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Map Terms</button>
+        </form>
+        {% if results %}
+        <div class="mt-4">
+            <h2 class="text-lg font-semibold">Mapping Results</h2>
+            <table class="w-full mt-2 border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border border-gray-300 p-2">Input Term</th>
+                        <th class="border border-gray-300 p-2">Mapped Term</th>
+                        <th class="border border-gray-300 p-2">Description</th>
+                        <th class="border border-gray-300 p-2">URI</th>
+                        <th class="border border-gray-300 p-2">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td class="border border-gray-300 p-2">{{ result.input_term }}</td>
+                        <td class="border border-gray-300 p-2">{{ result.term }}</td>
+                        <td class="border border-gray-300 p-2">{{ result.description }}</td>
+                        <td class="border border-gray-300 p-2"><a href="{{ result.uri }}" class="text-blue-500">{{ result.uri }}</a></td>
+                        <td class="border border-gray-300 p-2">{{ result.score|round(2) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h2 class="text-lg font-semibold mt-4">JSON-LD Export</h2>
+            <pre class="bg-gray-100 p-4 rounded">{{ jsonld }}</pre>
+            <a href="{{ url_for('export') }}" class="bg-green-500 text-white px-4 py-2 rounded mt-2 inline-block">Download All Mappings (JSON-LD)</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
