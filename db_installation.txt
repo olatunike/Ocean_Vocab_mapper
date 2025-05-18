@@ -1,0 +1,67 @@
+Database Creation:
+        Added a DO block to check if the database exists before creating it, preventing errors.
+        Uses dblink_exec for dynamic database creation (requires dblink extension; alternatively, run CREATE DATABASE manually if needed).
+    
+Schema Isolation:
+        Created a dedicated mapper schema to isolate tables from the public schema.
+        Set search_path to prioritize mapper schema for queries.
+          
+Application Role:
+        Created a mapper_app role with a secure password (must be changed in production).
+        Granted minimal privileges (CONNECT, USAGE, and specific table permissions) to reduce attack surface.
+          
+Data Validation:
+        Added CHECK constraints to enforce:
+            username: Alphanumeric with allowed special characters (4–50 characters).
+            term, input_term, mapped_term: Alphanumeric with spaces and underscores.
+            standard: Limited to 'SeaDataNet' or 'CF' for controlled vocabulary.
+            Non-empty password and totp_secret.
+        Increased uri length to VARCHAR(512) to accommodate longer URIs.
+Transaction Control:
+        Wrapped sample data insertion in a BEGIN/COMMIT block to ensure atomicity.
+    Permissions:
+        Removed broad ALL PRIVILEGES for postgres.
+        Granted specific privileges (SELECT, INSERT, etc.) to mapper_app only.
+        Revoked all privileges from PUBLIC to prevent unauthorized access.
+    Performance:
+        Retained indexes for efficient queries.
+        Added UNIQUE constraint on vocabularies(standard, term) to prevent duplicates.
+
+Usage Instructions
+
+    Enable dblink (if needed):
+    sql
+
+CREATE EXTENSION dblink;
+Run the Script:
+
+    Log in to PostgreSQL as a superuser (e.g., psql -U postgres).
+    Execute: \i path/to/init_db.sql
+    Alternatively, copy and paste into your PostgreSQL client.
+
+Configure Application:
+
+    Update app.py to use PostgreSQL with psycopg2. Example connection string:
+    python
+
+        import psycopg2
+        conn = psycopg2.connect(
+            dbname="ocean_vocabulary_mapper",
+            user="mapper_app",
+            password="secure_password_change_this",
+            host="localhost",
+            port="5432"
+        )
+        Replace SQLite queries with PostgreSQL-compatible ones (minor syntax adjustments may be needed).
+    Verify:
+        Check database: \l
+        List tables: \dt mapper.*
+        Verify data: SELECT * FROM mapper.vocabularies;
+
+Security Notes
+
+    Password: Change secure_password_change_this in production and store securely (e.g., in environment variables).
+    Network Security: Configure PostgreSQL to use SSL and restrict connections to trusted hosts.
+    Backup: Regularly back up the database to prevent data loss.
+    Auditing: Enable PostgreSQL logging to monitor access and queries.
+
